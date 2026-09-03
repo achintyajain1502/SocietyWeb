@@ -25,7 +25,7 @@ export default function Hero({ onNavigate, user, theme, onOpenLogin }) {
         <img
           src="https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=2000&q=85"
           alt="Grand Horizon Society Jaipur Architecture"
-          className="w-full h-full object-cover object-center filter brightness-95 opacity-30"
+          className="w-full h-full object-cover object-center filter brightness-95"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-50 via-slate-50/80 to-slate-900/10" />
       </div>
