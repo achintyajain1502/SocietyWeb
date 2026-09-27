@@ -1,0 +1,106 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" width="300" height="300" fill="none">
+  <rect width="300" height="300" rx="20" fill="#FFFFFF"/>
+  <rect x="15" y="15" width="270" height="270" rx="16" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="2"/>
+  
+  <!-- Outer Finder Pattern Top Left -->
+  <rect x="40" y="40" width="60" height="60" rx="10" fill="#0F172A"/>
+  <rect x="50" y="50" width="40" height="40" rx="6" fill="#FFFFFF"/>
+  <rect x="60" y="60" width="20" height="20" rx="3" fill="#0F172A"/>
+
+  <!-- Outer Finder Pattern Top Right -->
+  <rect x="200" y="40" width="60" height="60" rx="10" fill="#0F172A"/>
+  <rect x="210" y="50" width="40" height="40" rx="6" fill="#FFFFFF"/>
+  <rect x="220" y="60" width="20" height="20" rx="3" fill="#0F172A"/>
+
+  <!-- Outer Finder Pattern Bottom Left -->
+  <rect x="40" y="200" width="60" height="60" rx="10" fill="#0F172A"/>
+  <rect x="50" y="210" width="40" height="40" rx="6" fill="#FFFFFF"/>
+  <rect x="60" y="220" width="20" height="20" rx="3" fill="#0F172A"/>
+
+  <!-- Random Data Modules Grid -->
+  <!-- Row 1 -->
+  <rect x="115" y="40" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="135" y="40" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="160" y="40" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="175" y="40" width="12" height="12" rx="2" fill="#0F172A"/>
+
+  <!-- Row 2 -->
+  <rect x="115" y="58" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="145" y="58" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="175" y="58" width="12" height="12" rx="2" fill="#0F172A"/>
+
+  <!-- Row 3 -->
+  <rect x="115" y="76" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="130" y="76" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="160" y="76" width="12" height="12" rx="2" fill="#0F172A"/>
+
+  <!-- Row 4 -->
+  <rect x="40" y="115" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="58" y="115" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="76" y="115" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="100" y="115" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="120" y="115" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="140" y="115" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="165" y="115" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="185" y="115" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="210" y="115" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="230" y="115" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="248" y="115" width="12" height="12" rx="2" fill="#0F172A"/>
+
+  <!-- Row 5 -->
+  <rect x="40" y="135" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="76" y="135" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="100" y="135" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="185" y="135" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="210" y="135" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="248" y="135" width="12" height="12" rx="2" fill="#0F172A"/>
+
+  <!-- Row 6 -->
+  <rect x="40" y="155" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="58" y="155" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="100" y="155" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="185" y="155" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="230" y="155" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="248" y="155" width="12" height="12" rx="2" fill="#0F172A"/>
+
+  <!-- Row 7 -->
+  <rect x="40" y="175" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="76" y="175" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="100" y="175" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="120" y="175" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="140" y="175" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="165" y="175" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="185" y="175" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="210" y="175" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="248" y="175" width="12" height="12" rx="2" fill="#0F172A"/>
+
+  <!-- Bottom Data Grid -->
+  <rect x="115" y="200" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="135" y="200" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="160" y="200" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="180" y="200" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="200" y="200" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="225" y="200" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="248" y="200" width="12" height="12" rx="2" fill="#0F172A"/>
+
+  <rect x="115" y="220" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="145" y="220" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="165" y="220" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="190" y="220" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="215" y="220" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="235" y="220" width="12" height="12" rx="2" fill="#0F172A"/>
+
+  <rect x="115" y="240" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="135" y="240" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="155" y="240" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="180" y="240" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="205" y="240" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="230" y="240" width="12" height="12" rx="2" fill="#0F172A"/>
+  <rect x="248" y="240" width="12" height="12" rx="2" fill="#0F172A"/>
+
+  <!-- Center Official UPI Logo Badge -->
+  <rect x="118" y="118" width="64" height="64" rx="12" fill="#FFFFFF" stroke="#CBD5E1" stroke-width="2"/>
+  <path d="M135 130L150 160H165L150 130H135Z" fill="#0066B3"/>
+  <path d="M145 130L160 160H175L160 130H145Z" fill="#E06800"/>
+  <text x="150" y="174" font-family="Arial, sans-serif" font-weight="900" font-size="10" fill="#0F172A" text-anchor="middle">BHIM UPI</text>
+</svg>

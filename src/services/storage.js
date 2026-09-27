@@ -150,7 +150,6 @@ const DEFAULT_CURRENT_BILL = {
   totalAmount: 3500
 };
 
-// Helper storage API
 export const getStoredNotices = () => {
   const data = localStorage.getItem('gh_notices');
   return data ? JSON.parse(data) : DEFAULT_NOTICES;
@@ -169,13 +168,15 @@ export const saveGallery = (gallery) => {
   localStorage.setItem('gh_gallery', JSON.stringify(gallery));
 };
 
-export const getStoredPayments = () => {
-  const data = localStorage.getItem('gh_payments');
+export const getStoredPayments = (userId) => {
+  const key = userId ? `gh_payments_${userId}` : 'gh_payments';
+  const data = localStorage.getItem(key);
   return data ? JSON.parse(data) : DEFAULT_PAYMENTS;
 };
 
-export const savePayments = (payments) => {
-  localStorage.setItem('gh_payments', JSON.stringify(payments));
+export const savePayments = (payments, userId) => {
+  const key = userId ? `gh_payments_${userId}` : 'gh_payments';
+  localStorage.setItem(key, JSON.stringify(payments));
 };
 
 export const getStoredUser = () => {
@@ -191,16 +192,22 @@ export const saveUser = (user) => {
   }
 };
 
-export const getCurrentBill = () => {
-  const billState = localStorage.getItem('gh_current_bill');
+export const getCurrentBill = (userId) => {
+  const key = userId ? `gh_current_bill_${userId}` : 'gh_current_bill';
+  const billState = localStorage.getItem(key);
   return billState ? JSON.parse(billState) : DEFAULT_CURRENT_BILL;
 };
 
-export const saveCurrentBill = (bill) => {
-  localStorage.setItem('gh_current_bill', JSON.stringify(bill));
+export const saveCurrentBill = (bill, userId) => {
+  const key = userId ? `gh_current_bill_${userId}` : 'gh_current_bill';
+  localStorage.setItem(key, JSON.stringify(bill));
 };
 
-export const resetDemoPayments = () => {
+export const resetDemoPayments = (userId) => {
+  if (userId) {
+    localStorage.removeItem(`gh_payments_${userId}`);
+    localStorage.removeItem(`gh_current_bill_${userId}`);
+  }
   localStorage.removeItem('gh_payments');
   localStorage.removeItem('gh_current_bill');
   return {

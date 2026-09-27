@@ -155,20 +155,72 @@ app.get('/api/maintenance/my-bill', (req, res) => {
 
     const payments = db.prepare('SELECT * FROM payment_transactions WHERE user_id = ? ORDER BY date DESC').all(userId);
 
+    const rawBreakdown = JSON.parse(bill.breakdown_json || '[]');
+    let breakdownList = [...rawBreakdown];
+    let computedStatus = bill.status;
+    let computedDelayDays = bill.delay_days || 0;
+    let computedFineAmount = bill.fine_amount || 0;
+    let computedTotalAmount = bill.total_amount;
+
+    // Dynamic due days calculation if bill is unpaid
+    if (bill.status !== 'PAID' && bill.due_date) {
+      const today = new Date();
+      const dueParts = bill.due_date.split('-'); // YYYY-MM-DD
+      const dueDate = new Date(parseInt(dueParts[0]), parseInt(dueParts[1]) - 1, parseInt(dueParts[2]));
+      
+      const todayMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      const dueMidnight = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+      
+      const diffMs = todayMidnight.getTime() - dueMidnight.getTime();
+      const calcDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      if (calcDays > 0) {
+        computedStatus = 'DELAYED';
+        computedDelayDays = calcDays;
+        computedFineAmount = bill.fine_amount > 0 ? bill.fine_amount : 350;
+
+        // Base breakdown without fine
+        const baseItems = rawBreakdown.filter(i => 
+          !i.item.toLowerCase().includes('late') && 
+          !i.item.toLowerCase().includes('penalty') && 
+          !i.item.toLowerCase().includes('fine')
+        );
+        const baseSum = baseItems.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+        computedTotalAmount = baseSum + computedFineAmount;
+
+        breakdownList = [
+          ...baseItems,
+          { item: 'Late Payment Penalty (Overdue Fee)', amount: computedFineAmount }
+        ];
+      } else {
+        computedStatus = 'PENDING';
+        computedDelayDays = 0;
+        computedFineAmount = 0;
+        
+        const baseItems = rawBreakdown.filter(i => 
+          !i.item.toLowerCase().includes('late') && 
+          !i.item.toLowerCase().includes('penalty') && 
+          !i.item.toLowerCase().includes('fine')
+        );
+        breakdownList = baseItems;
+        computedTotalAmount = baseItems.reduce((acc, curr) => acc + (curr.amount || 0), 0);
+      }
+    }
+
     res.json({
       currentBill: {
         id: bill.id,
         month: bill.month,
         dueDate: bill.due_date,
         unit: bill.unit,
-        status: bill.status, // 'PAID' (Given) | 'PENDING' | 'DELAYED' (Overdue)
-        breakdown: JSON.parse(bill.breakdown_json),
-        totalAmount: bill.total_amount,
+        status: computedStatus, // 'PAID' | 'PENDING' | 'DELAYED'
+        breakdown: breakdownList,
+        totalAmount: computedTotalAmount,
         paidAt: bill.paid_at,
         method: bill.method,
         receiptNo: bill.receipt_no,
-        delayDays: bill.delay_days || 0,
-        fineAmount: bill.fine_amount || 0
+        delayDays: computedDelayDays,
+        fineAmount: computedFineAmount
       },
       payments
     });

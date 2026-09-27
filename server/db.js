@@ -117,19 +117,27 @@ function seedDefaultData() {
       { item: 'Sinking & Reserve Fund', amount: 300 }
     ]);
 
+    const breakdownDelayed = JSON.stringify([
+      { item: 'Flat Maintenance Charge', amount: 2400 },
+      { item: 'Water & Sewerage Usage', amount: 450 },
+      { item: 'Clubhouse & Amenities Fee', amount: 350 },
+      { item: 'Sinking & Reserve Fund', amount: 300 },
+      { item: 'Late Payment Penalty (Overdue Fee)', amount: 350 }
+    ]);
+
     const insertBill = db.prepare(`
       INSERT INTO maintenance_bills (user_id, unit, month, due_date, total_amount, breakdown_json, status, paid_at, method, receipt_no, delay_days, fine_amount)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
-    // 1. John Doe -> PENDING
-    insertBill.run(user1.lastInsertRowid, 'Block B - 402', 'September 2026', '2026-09-10', 3500, breakdownStandard, 'PENDING', null, null, null, 0, 0);
+    // 1. John Doe -> September 2026 (Due Sept 30, 2026 - PENDING)
+    insertBill.run(user1.lastInsertRowid, 'Block B - 402', 'September 2026', '2026-09-30', 3500, breakdownStandard, 'PENDING', null, null, null, 0, 0);
 
-    // 2. Amit Sharma -> DELAYED (Overdue by 16 Days, Late Fee ₹350)
-    insertBill.run(user2.lastInsertRowid, 'Block A - 102', 'September 2026', '2026-08-10', 3850, breakdownStandard, 'DELAYED', null, null, null, 16, 350);
+    // 2. Amit Sharma -> August 2026 (Due Aug 10, 2026 - DELAYED / OVERDUE)
+    insertBill.run(user2.lastInsertRowid, 'Block A - 102', 'August 2026', '2026-08-10', 3850, breakdownDelayed, 'DELAYED', null, null, null, 48, 350);
 
-    // 3. Rahul Kapoor -> PAID (GIVEN on Aug 5)
-    insertBill.run(user3.lastInsertRowid, 'Block C - 301', 'September 2026', '2026-09-10', 3500, breakdownStandard, 'PAID', '2026-08-05', 'Razorpay API (pay_Rzp_881923)', 'REC-2026-99120', 0, 0);
+    // 3. Rahul Kapoor -> August 2026 (Due Aug 15, 2026 - DELAYED / OVERDUE)
+    insertBill.run(user3.lastInsertRowid, 'Block C - 301', 'August 2026', '2026-08-15', 3850, breakdownDelayed, 'DELAYED', null, null, null, 43, 350);
 
     // 4. Pooja Mehta -> PAID (GIVEN on Aug 3)
     insertBill.run(user5.lastInsertRowid, 'Block D - 204', 'September 2026', '2026-09-10', 3500, breakdownStandard, 'PAID', '2026-08-03', 'NTT Data Gateway (HDFC NetBanking)', 'REC-2026-88129', 0, 0);

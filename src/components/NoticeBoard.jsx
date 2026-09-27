@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { 
   Bell, Plus, Search, Pin, Calendar, User as UserIcon, 
-  Info, X, Send
+  Info, X, Send, Trash2, Shield
 } from 'lucide-react';
 
-export default function NoticeBoard({ notices, onAddNotice, user, onOpenLogin, theme }) {
+export default function NoticeBoard({ notices, onAddNotice, onDeleteNotice, onTogglePinNotice, user, onOpenLogin, theme }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [showAddModal, setShowAddModal] = useState(false);
@@ -174,7 +174,7 @@ export default function NoticeBoard({ notices, onAddNotice, user, onOpenLogin, t
                 {/* Notice Top Metadata */}
                 <div>
                   <div className="flex items-center justify-between mb-3 gap-2">
-                    <div className="flex items-center space-x-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <span className={`px-2.5 py-1 text-xs rounded-lg border ${getCategoryBadge(notice.category)}`}>
                         {notice.category}
                       </span>
@@ -185,9 +185,33 @@ export default function NoticeBoard({ notices, onAddNotice, user, onOpenLogin, t
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center space-x-1 text-xs text-slate-500 font-medium">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{notice.date}</span>
+                    <div className="flex items-center space-x-2">
+                      <div className="flex items-center space-x-1 text-xs text-slate-500 font-medium">
+                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                        <span>{notice.date}</span>
+                      </div>
+
+                      {/* Admin Quick Options */}
+                      {user && user.role === 'Admin' && (
+                        <div className="flex items-center space-x-1 bg-slate-100 p-1 rounded-lg border border-slate-200 ml-2">
+                          <button
+                            onClick={() => onTogglePinNotice && onTogglePinNotice(notice.id)}
+                            className={`p-1.5 rounded-md text-xs transition-colors ${
+                              notice.pinned ? 'bg-amber-500 text-white font-bold' : 'text-slate-600 hover:bg-slate-200'
+                            }`}
+                            title={notice.pinned ? 'Unpin Notice' : 'Pin Notice to Top'}
+                          >
+                            <Pin className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            onClick={() => onDeleteNotice && onDeleteNotice(notice.id)}
+                            className="p-1.5 rounded-md text-rose-600 hover:bg-rose-100 transition-colors"
+                            title="Delete Notice (Admin Only)"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -208,7 +232,13 @@ export default function NoticeBoard({ notices, onAddNotice, user, onOpenLogin, t
                     <UserIcon className={`w-3.5 h-3.5 ${theme.iconColor}`} />
                     <span>Posted by <strong className="text-slate-800">{notice.author}</strong></span>
                   </div>
-                  <span className="text-[11px] text-slate-400 font-medium">Official Entry</span>
+                  {user && user.role === 'Admin' ? (
+                    <span className="text-[10px] font-extrabold bg-indigo-100 text-indigo-800 px-2 py-0.5 rounded border border-indigo-200 flex items-center gap-1">
+                      <Shield className="w-3 h-3 text-indigo-600" /> Admin Options Active
+                    </span>
+                  ) : (
+                    <span className="text-[11px] text-slate-400 font-medium">Official Entry</span>
+                  )}
                 </div>
 
               </div>

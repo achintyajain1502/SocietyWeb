@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { 
   Image as ImageIcon, Heart, Maximize2, X, Upload, 
-  User, Lock, LogIn, Shield, PlusCircle, Check
+  User, Lock, LogIn, Shield, PlusCircle, Check, Trash2
 } from 'lucide-react';
 
-export default function GallerySection({ gallery, onAddImage, user, onOpenLogin, theme }) {
+export default function GallerySection({ gallery, onAddImage, onDeleteImage, user, onOpenLogin, theme }) {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [activeLightbox, setActiveLightbox] = useState(null);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -221,11 +221,25 @@ export default function GallerySection({ gallery, onAddImage, user, onOpenLogin,
                     >
                       <Maximize2 className="w-5 h-5" />
                     </button>
+                    {user && user.role === 'Admin' && (
+                      <button
+                        onClick={() => onDeleteImage && onDeleteImage(item.id)}
+                        className="p-3 bg-rose-600 text-white hover:bg-rose-700 rounded-full transition-colors shadow-lg"
+                        title="Delete Photo (Admin Only)"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    )}
                   </div>
 
                   <span className={`absolute top-3 left-3 px-2.5 py-1 text-[11px] font-bold bg-white/90 ${theme.badgeText} rounded-lg border border-slate-200 shadow-sm backdrop-blur-md`}>
                     {item.category}
                   </span>
+                  {user && user.role === 'Admin' && (
+                    <span className="absolute top-3 right-3 px-2 py-0.5 text-[10px] font-black bg-rose-600 text-white rounded-md shadow-sm">
+                      ADMIN
+                    </span>
+                  )}
                 </div>
 
                 {/* Footer Info */}

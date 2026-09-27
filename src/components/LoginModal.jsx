@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, LogIn, UserPlus, ShieldCheck, Lock, AlertCircle, RefreshCw } from 'lucide-react';
+import { X, LogIn, UserPlus, ShieldCheck, Lock, AlertCircle, RefreshCw, CheckCircle2 } from 'lucide-react';
 import { loginApi, registerApi } from '../services/api';
 
 export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme }) {
@@ -13,31 +13,74 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme }) {
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [unit, setUnit] = useState('Block B - 402');
-  const [role, setRole] = useState('Resident'); // 'Resident' or 'Admin'
+  const role = 'Flat Resident';
+
+  // OTP Fields
+  const [otpSent, setOtpSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpVerified, setOtpVerified] = useState(false);
 
   if (!isOpen) return null;
+
+  const handlePhoneChange = (e) => {
+    const digitsOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
+    setPhone(digitsOnly);
+  };
+
+  const handleSendOtp = () => {
+    if (phone.length !== 10) {
+      setError('Please enter a valid 10-digit mobile number');
+      return;
+    }
+    setOtpSent(true);
+    setError('');
+    alert(`Mock OTP sent to +91 ${phone}! Please enter 1234 to verify.`);
+  };
+
+  const handleVerifyOtp = () => {
+    if (otp === '1234') {
+      setOtpVerified(true);
+      setError('');
+    } else {
+      setError('Invalid OTP. Please enter 1234.');
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+
+    if (isRegister) {
+      if (phone.length !== 10) {
+        setError('Mobile number must be exactly 10 digits.');
+        return;
+      }
+      if (!otpVerified) {
+        setError('Please verify your mobile number with OTP first.');
+        return;
+      }
+      if (!unit.trim()) {
+        setError('Please enter your Flat Unit.');
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
       if (isRegister) {
-        // Register API Call to SQLite database
         const res = await registerApi({
           name: name.trim(),
           email: email.trim(),
           password,
-          phone: phone.trim() || '+91 98290 12345',
-          unit,
-          role
+          phone: `+91 ${phone.trim()}`,
+          unit: unit.trim(),
+          role: 'Resident'
         });
 
         onLoginSuccess(res.user);
         onClose();
       } else {
-        // Login API Call to SQLite database
         const res = await loginApi(email.trim(), password);
         onLoginSuccess(res.user);
         onClose();
@@ -67,8 +110,8 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme }) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 sm:p-8 shadow-2xl relative space-y-6 max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in overflow-hidden">
+      <div className="bg-white border border-slate-200 rounded-2xl w-full max-w-md p-6 sm:p-7 shadow-2xl relative space-y-4 my-auto overflow-hidden">
         
         {/* Close Button */}
         <button
@@ -79,7 +122,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme }) {
         </button>
 
         {/* Modal Header */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-1.5">
           <div className={`w-12 h-12 rounded-2xl ${theme.badgeBg} ${theme.badgeText} border ${theme.badgeBorder} flex items-center justify-center mx-auto shadow-sm`}>
             {isRegister ? <UserPlus className="w-6 h-6" /> : <LogIn className="w-6 h-6" />}
           </div>
@@ -96,25 +139,25 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme }) {
 
         {/* Error Alert */}
         {error && (
-          <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-semibold flex items-center space-x-2">
+          <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 font-semibold flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
         {/* Auth Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-3.5">
           
           {isRegister && (
             <>
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Full Name *
+                  FULL NAME *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Rajesh Sharma"
+                  placeholder="Test"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-slate-900"
@@ -123,47 +166,86 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme }) {
 
               <div>
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                  Mobile Number (+91)
+                  MOBILE NUMBER (+91) *
                 </label>
-                <input
-                  type="text"
-                  placeholder="+91 98290 12345"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-slate-900"
-                />
+                <div className="flex space-x-2">
+                  <input
+                    type="text"
+                    required
+                    maxLength={10}
+                    disabled={otpVerified}
+                    placeholder="1234789514"
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-slate-900 disabled:opacity-50 font-semibold"
+                  />
+                  {!otpVerified && (
+                    <button
+                      type="button"
+                      onClick={handleSendOtp}
+                      className="px-3.5 py-2.5 bg-slate-800 text-white text-xs font-bold rounded-xl hover:bg-slate-900 transition-colors whitespace-nowrap"
+                    >
+                      {otpSent ? 'Resend' : 'Send OTP'}
+                    </button>
+                  )}
+                  {otpVerified && (
+                    <div className="flex items-center justify-center px-3 bg-green-50 border border-green-200 rounded-xl">
+                      <CheckCircle2 className="w-5 h-5 text-green-600" />
+                    </div>
+                  )}
+                </div>
               </div>
+
+              {otpSent && !otpVerified && (
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
+                    ENTER OTP (Try 1234)
+                  </label>
+                  <div className="flex space-x-2">
+                    <input
+                      type="text"
+                      maxLength={4}
+                      placeholder="1234"
+                      value={otp}
+                      onChange={(e) => setOtp(e.target.value)}
+                      className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-slate-900 font-semibold"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      className="px-4 py-2.5 bg-green-600 text-white text-xs font-bold rounded-xl hover:bg-green-700 transition-colors"
+                    >
+                      Verify
+                    </button>
+                  </div>
+                </div>
+              )}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    Flat Unit *
+                    FLAT UNIT *
                   </label>
-                  <select
+                  <input
+                    type="text"
+                    required
+                    placeholder="Block B - 402"
                     value={unit}
                     onChange={(e) => setUnit(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none font-semibold"
-                  >
-                    <option value="Block A - 102">Block A - 102 (Delayed Demo)</option>
-                    <option value="Block B - 402">Block B - 402 (Pending Demo)</option>
-                    <option value="Block C - 301">Block C - 301 (Given Demo)</option>
-                    <option value="Block D - 204">Block D - 204 (Given Demo)</option>
-                    <option value="Block A - 501">Block A - 501</option>
-                  </select>
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none focus:border-slate-900 font-semibold"
+                  />
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-                    User Role *
+                    USER ROLE *
                   </label>
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs text-slate-900 focus:outline-none font-semibold"
-                  >
-                    <option value="Resident">Flat Resident</option>
-                    <option value="Admin">Society Admin</option>
-                  </select>
+                  <input
+                    type="text"
+                    readOnly
+                    value="Flat Resident"
+                    className="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-xs text-slate-600 font-semibold cursor-not-allowed"
+                  />
                 </div>
               </div>
             </>
@@ -171,12 +253,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme }) {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-              Email Address *
+              EMAIL ADDRESS *
             </label>
             <input
               type="email"
               required
-              placeholder="e.g. john@horizon.com"
+              placeholder="Testing@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-slate-900"
@@ -185,12 +267,12 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme }) {
 
           <div>
             <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">
-              Password *
+              PASSWORD *
             </label>
             <input
               type="password"
               required
-              placeholder="••••••••"
+              placeholder="••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm text-slate-900 focus:outline-none focus:border-slate-900"
@@ -200,13 +282,13 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme }) {
           {/* Submit Button */}
           <button
             type="submit"
-            disabled={loading}
-            className={`w-full flex items-center justify-center space-x-2 py-3 rounded-xl ${theme.buttonBg} text-white font-extrabold text-sm shadow-md transition-all mt-2`}
+            disabled={loading || (isRegister && !otpVerified)}
+            className={`w-full flex items-center justify-center space-x-2 py-3 rounded-xl ${theme.buttonBg} text-white font-extrabold text-sm shadow-md transition-all mt-2 disabled:opacity-50`}
           >
             {loading ? (
               <>
                 <RefreshCw className="w-4 h-4 animate-spin" />
-                <span>Validating with Database...</span>
+                <span>Validating...</span>
               </>
             ) : (
               <>
@@ -253,7 +335,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess, theme }) {
         )}
 
         {/* Toggle Sign In / Register */}
-        <div className="text-center text-xs text-slate-500 pt-2 border-t border-slate-100">
+        <div className="text-center text-xs text-slate-500 pt-1 border-t border-slate-100">
           {isRegister ? 'Already registered?' : 'New resident in society?'}{' '}
           <button
             type="button"

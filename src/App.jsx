@@ -9,6 +9,7 @@ import LoginModal from './components/LoginModal';
 import Footer from './components/Footer';
 
 import { THEMES } from './services/themes';
+import { fetchUserBillApi } from './services/api';
 import {
   getStoredNotices,
   saveNotices,
@@ -47,14 +48,13 @@ export default function App() {
     totalAmount: 3500
   });
 
-  // Load Initial Data from LocalStorage
+  // Load Initial Global Data
   useEffect(() => {
     setNotices(getStoredNotices());
     setGallery(getStoredGallery());
-    setPayments(getStoredPayments());
-    setUser(getStoredUser());
-    setCurrentBill(getCurrentBill());
-    
+    const storedUser = getStoredUser();
+    setUser(storedUser);
+
     // Theme persistence
     const savedThemeId = localStorage.getItem('gh_theme');
     if (savedThemeId) {
@@ -62,6 +62,29 @@ export default function App() {
       if (found) setCurrentTheme(found);
     }
   }, []);
+
+  // Fetch specific user's bill from SQLite API whenever `user` changes
+  useEffect(() => {
+    if (user && user.id) {
+      fetchUserBillApi(user.id)
+        .then((res) => {
+          if (res && res.currentBill) {
+            setCurrentBill(res.currentBill);
+            setPayments(res.payments || []);
+            saveCurrentBill(res.currentBill, user.id);
+            savePayments(res.payments || [], user.id);
+          }
+        })
+        .catch(() => {
+          // Fallback to per-user localStorage
+          setCurrentBill(getCurrentBill(user.id));
+          setPayments(getStoredPayments(user.id));
+        });
+    } else {
+      setCurrentBill(getCurrentBill(null));
+      setPayments(getStoredPayments(null));
+    }
+  }, [user]);
 
   const handleSelectTheme = (theme) => {
     setCurrentTheme(theme);
@@ -86,8 +109,26 @@ export default function App() {
     saveNotices(updated);
   };
 
+  const handleDeleteNotice = (noticeId) => {
+    const updated = notices.filter((n) => n.id !== noticeId);
+    setNotices(updated);
+    saveNotices(updated);
+  };
+
+  const handleTogglePinNotice = (noticeId) => {
+    const updated = notices.map((n) => (n.id === noticeId ? { ...n, pinned: !n.pinned } : n));
+    setNotices(updated);
+    saveNotices(updated);
+  };
+
   const handleAddGalleryImage = (newImage) => {
     const updated = [newImage, ...gallery];
+    setGallery(updated);
+    saveGallery(updated);
+  };
+
+  const handleDeleteGalleryImage = (imageId) => {
+    const updated = gallery.filter((g) => g.id !== imageId);
     setGallery(updated);
     saveGallery(updated);
   };
@@ -95,18 +136,22 @@ export default function App() {
   const handleCompletePayment = (txnRecord) => {
     const updatedPayments = [txnRecord, ...payments];
     setPayments(updatedPayments);
-    savePayments(updatedPayments);
 
     const updatedBill = {
       ...currentBill,
       status: 'PAID'
     };
     setCurrentBill(updatedBill);
-    saveCurrentBill(updatedBill);
+
+    if (user && user.id) {
+      savePayments(updatedPayments, user.id);
+      saveCurrentBill(updatedBill, user.id);
+    }
   };
 
   const handleResetPayment = () => {
-    const resetData = resetDemoPayments();
+    const userId = user ? user.id : null;
+    const resetData = resetDemoPayments(userId);
     setPayments(resetData.payments);
     setCurrentBill(resetData.currentBill);
   };
@@ -140,12 +185,14 @@ export default function App() {
         />
 
         {/* Content Paragraphs / About Section */}
-        <AboutSection theme={currentTheme} />
+        <AboutSection theme={currentTheme} user={user} />
 
         {/* Interactive Notice Board */}
         <NoticeBoard
           notices={notices}
           onAddNotice={handleAddNotice}
+          onDeleteNotice={handleDeleteNotice}
+          onTogglePinNotice={handleTogglePinNotice}
           user={user}
           onOpenLogin={() => setIsLoginOpen(true)}
           theme={currentTheme}
@@ -157,7 +204,6 @@ export default function App() {
             currentBill={currentBill}
             payments={payments}
             onCompletePayment={handleCompletePayment}
-            onResetPayment={handleResetPayment}
             user={user}
             onOpenLogin={() => setIsLoginOpen(true)}
             theme={currentTheme}
@@ -169,6 +215,7 @@ export default function App() {
           <GallerySection
             gallery={gallery}
             onAddImage={handleAddGalleryImage}
+            onDeleteImage={handleDeleteGalleryImage}
             user={user}
             onOpenLogin={() => setIsLoginOpen(true)}
             theme={currentTheme}
