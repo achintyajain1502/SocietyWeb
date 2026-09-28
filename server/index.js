@@ -1,12 +1,18 @@
 const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const db = require('./db');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const JWT_SECRET = process.env.JWT_SECRET || 'local-development-only-secret';
+const frontendUrl = process.env.FRONTEND_URL;
 
-app.use(cors());
+app.use(cors({
+  origin: frontendUrl || true,
+  credentials: true
+}));
 app.use(express.json());
 
 // Health Check Endpoint
@@ -73,6 +79,15 @@ app.post('/api/auth/register', (req, res) => {
       role: userRole
     };
 
+    const token = jwt.sign({ userId: newUserId, role: userRole }, JWT_SECRET, { expiresIn: '7d' });
+    res.cookie('society_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/'
+    });
+
     res.status(201).json({
       message: 'Registration successful! Resident account created in SQLite database.',
       user: userProfile
@@ -110,6 +125,15 @@ app.post('/api/auth/login', (req, res) => {
       unit: user.unit,
       role: user.role
     };
+
+    const token = jwt.sign({ userId: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    res.cookie('society_token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/'
+    });
 
     res.json({
       message: 'Login successful!',
@@ -393,7 +417,10 @@ app.post('/api/gallery', (req, res) => {
   }
 });
 
-// Start Express Server
-app.listen(PORT, () => {
-  console.log(`🚀 Grand Horizon Express + SQLite Database Server running at http://localhost:${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`Grand Horizon API running on port ${PORT}`);
+  });
+}
+
+module.exports = app;

@@ -1,8 +1,10 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const configuredApiUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://localhost:5000' : '');
+const API_BASE_URL = `${configuredApiUrl.replace(/\/$/, '')}/api`;
 
 // Helper HTTP Fetcher
 async function request(endpoint, options = {}) {
   const config = {
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...options.headers,

@@ -1,4 +1,26 @@
-# React + Vite
+# Society Website
+
+## Deploying the backend
+
+The backend is the Express app in `server/`. Deploy that folder as a Node service on a
+host that supports a persistent disk, because the current SQLite database is stored in
+`server/society.db`.
+
+Set these backend environment variables in the hosting dashboard:
+
+- `NODE_ENV=production`
+- `JWT_SECRET` to a long random value
+- `FRONTEND_URL` to the deployed frontend URL
+
+The backend start command is `npm start` and its health check is `/api/health`.
+
+When building the Vite frontend, set `VITE_API_URL` to the public backend URL, for example
+`https://society-api.example.com`. The frontend includes credentials so the login session
+cookie can be used across the two deployed services.
+
+For local development, install dependencies in both folders, start the backend with
+`npm run dev` from `server/`, and start the frontend with `npm run dev` from the project
+root. The seeded demo login is `john@horizon.com` / `password123`.
 
 This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
